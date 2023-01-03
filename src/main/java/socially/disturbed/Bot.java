@@ -1,30 +1,44 @@
 package socially.disturbed;
 
-import discord4j.core.DiscordClientBuilder;
+import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
+import discord4j.core.object.entity.channel.MessageChannel;
 
 public class Bot {
-    public Bot(String token) {
-        GatewayDiscordClient client = DiscordClientBuilder.create(token).build().login().block();
 
-        client.getEventDispatcher().on(ReadyEvent.class)
+    public Bot(String token) {
+
+        DiscordClient client = DiscordClient.create(token);
+        GatewayDiscordClient gateway = client.login().block();
+
+        gateway.getEventDispatcher().on(ReadyEvent.class)
                 .subscribe(event -> {
                     User self = event.getSelf();
-                    System.out.println(String.format("Logged in as %s#%s", self.getUsername(), self.getDiscriminator()));
+                    System.out.printf("Logged in as %s#%s%n", self.getUsername(), self.getDiscriminator());
                 });
 
-        client.getEventDispatcher().on(MessageCreateEvent.class)
-                .map(MessageCreateEvent::getMessage)
-                .filter(message -> message.getAuthor().map(user -> !user.isBot()).orElse(false))
-                .filter(message -> message.getContent().equalsIgnoreCase("!ping"))
-                .flatMap(Message::getChannel)
-                .flatMap(channel -> channel.createMessage("Pong!"))
-                .subscribe();
 
-        client.onDisconnect().block();
+        gateway
+                .on(MessageCreateEvent.class)
+                .map(MessageCreateEvent::getMessage)
+                .subscribe(this::handleMessage);
+
+        gateway.onDisconnect().block();
+    }
+
+    private void handleMessage(Message message) {
+
+        if (message.getAuthor().get().isBot()) return;
+        if (message.getContent().equalsIgnoreCase("!ping")) {
+
+            System.out.println(message.getContent());
+
+            MessageChannel channel = message.getChannel().block();
+            channel.createMessage("ping pong mfkr").subscribe();
+        }
     }
 }
