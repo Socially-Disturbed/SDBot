@@ -113,7 +113,7 @@ public class Bot {
     private void sendPlayers(boolean guestList) {
         String channelId = "";
         if (guestList) {
-            channelId = DiscordChannelID.GUEST_HIGHSCORE_TEST.label;
+            channelId = DiscordChannelID.GUEST_HIGHSCORE.label;
         } else {
             channelId = DiscordChannelID.SD_HIGHSCORE.label;
         }
