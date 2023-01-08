@@ -8,11 +8,11 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
+import socially.disturbed.utility.DiscordChannelID;
+import socially.disturbed.utility.Utilities;
 
 import java.util.Arrays;
 import java.util.List;
-
-import static socially.disturbed.DiscordChannelID.SD_HIGHSCORE_TEST;
 
 public class Bot {
     DbService dbService;
@@ -43,7 +43,10 @@ public class Bot {
 
         if (message.getAuthor().get().isBot()) return;
 
-        if (message.getContent().split(" ")[0].equalsIgnoreCase("!updateGuest")) {
+        if (message.getContent().split(" ")[0].equalsIgnoreCase("!help")) {
+            returnAllCommands(message);
+        }
+        else if (message.getContent().split(" ")[0].equalsIgnoreCase("!updateGuest")) {
             updateGuestList(message);
         }
         else if (message.getContent().split(" ")[0].equalsIgnoreCase("!update")) {
@@ -58,6 +61,11 @@ public class Bot {
 //            message.delete().subscribe();
 //            sendPlayers(true, SD_HIGHSCORE_TEST);
 //        }
+    }
+
+    private void returnAllCommands(Message message) {
+        MessageChannel channel = message.getChannel().block();
+        channel.createMessage(Utilities.commands).subscribe();
     }
 
     private void addPlayerToGuestList(Message message) {
