@@ -1,4 +1,4 @@
-package socially.disturbed.utility;
+package socially.disturbed.discord;
 
 public enum DiscordChannelID {
     SD_HIGHSCORE("1059552489621426188"),

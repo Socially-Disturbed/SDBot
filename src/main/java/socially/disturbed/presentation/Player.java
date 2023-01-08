@@ -1,4 +1,4 @@
-package socially.disturbed;
+package socially.disturbed.presentation;
 
 public class Player {
     private String name;

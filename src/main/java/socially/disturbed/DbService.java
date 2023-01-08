@@ -1,5 +1,7 @@
 package socially.disturbed;
 
+import socially.disturbed.presentation.Player;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +20,7 @@ public class DbService {
 
     public DbService() {}
 
-    public boolean addPlayer(boolean guest, String playerName) {
+    public void addPlayer(boolean guest, String playerName) {
         String statement = "";
         if (guest) {
             statement = INSERT_NEW_GUEST;
@@ -26,7 +28,7 @@ public class DbService {
         else {
             statement = INSERT_NEW_SD;
         }
-        statement += "VALUES ('" + playerName+ "')";
+        statement += " VALUES ('" + playerName+ "')";
         System.out.println(statement);
 
         try (Connection conn = DriverManager.getConnection(
@@ -35,75 +37,89 @@ public class DbService {
 
             ResultSet resultSet = preparedStatement.executeQuery();
             System.out.println(resultSet);
-            return resultSet.rowUpdated();
+            return;
         } catch (SQLException e) {
             System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return false;
+        return;
     }
 
-    public boolean updatePlayer(String playerName, boolean updateGuestList, String scoreType, float value) {
-        if (scoreType.equalsIgnoreCase("win")) {
-            return updatePlayerWin(playerName, updateGuestList);
-        }
+    public List<Player> updatePlayer(String playerName, boolean guestList, String scoreType, float value) {
+        Player player = getPlayer(playerName, guestList);
+        if (player == null) {
+            System.out.println("No players registered named: " + playerName + "\n adding player to list");
+            addPlayer(guestList, playerName);
+            return updatePlayer(playerName, guestList, "WINS", 1);
 
+        }
+        List<Player> players = new ArrayList<>();
         String statement = "";
-        if (updateGuestList) {
+        if (guestList) {
             statement = UPDATE_GUEST_SCORE;
         }
         else {
             statement = UPDATE_SD_SCORE;
         }
-        statement += "SET \"" +scoreType + "\" = " + value + " WHERE \"NAME\" = '" + playerName + "'";
+        statement += " SET \"" +scoreType + "\" = " + value + " WHERE \"NAME\" = '" + playerName + "'";
         System.out.println(statement);
         try (Connection conn = DriverManager.getConnection(
                 "jdbc:postgresql://127.0.0.1:8080/postgres", "postgres", "admin");
              PreparedStatement preparedStatement = conn.prepareStatement(statement)) {
 
-            ResultSet resultSet = preparedStatement.executeQuery();
-            return resultSet.rowUpdated();
+            int rowUpdated = preparedStatement.executeUpdate();
+            if (rowUpdated > 0) {
+                players = getAllPlayers(guestList);
+            }
         } catch (SQLException e) {
             System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return false;
+        return players;
     }
 
-    public boolean updatePlayerWin(String playerName, boolean updateGuestList) {
-        Player player = getPlayer(playerName, updateGuestList);
-        System.out.println(player.toString());
+    public List<Player> updatePlayerWin(String playerName, boolean guestList) {
+        Player player = getPlayer(playerName, guestList);
+        if (player == null) {
+            System.out.println("No players registered named: " + playerName + "\n adding player to list");
+            addPlayer(guestList, playerName);
+            return updatePlayer(playerName, guestList, "WINS", 1);
+        }
+        List<Player> players = new ArrayList<>();
+        System.out.println(player);
         int wins = player.getWins() + 1;
 
         String statement = "";
-        if (updateGuestList) {
+        if (guestList) {
             statement += UPDATE_GUEST_SCORE;
         }
         else {
             statement += UPDATE_SD_SCORE;
         }
-        statement += "SET \"WINS\" = " + wins + " WHERE \"NAME\" = '" + playerName + "'";
+        statement += " SET \"WINS\" = " + wins + " WHERE \"NAME\" = '" + playerName + "'";
         System.out.println(statement);
 
         try (Connection conn = DriverManager.getConnection(
                 "jdbc:postgresql://127.0.0.1:8080/postgres", "postgres", "admin");
              PreparedStatement preparedStatement = conn.prepareStatement(statement)) {
 
-            ResultSet resultSet = preparedStatement.executeQuery();
-            return resultSet.rowUpdated();
+            int rowUpdated = preparedStatement.executeUpdate();
+            if (rowUpdated > 0) {
+                players = getAllPlayers(guestList);
+            }
         } catch (SQLException e) {
             System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return false;
+        return players;
     }
 
-    public Player getPlayer(String playerName, boolean updateGuestList) {
+    public Player getPlayer(String playerName, boolean guestList) {
         String statement = "";
-        if (updateGuestList) {
+        if (guestList) {
             statement += GET_GUEST_PLAYER;
         }
         else {
@@ -117,18 +133,19 @@ public class DbService {
              PreparedStatement preparedStatement = conn.prepareStatement(statement)) {
 
             ResultSet resultSet = preparedStatement.executeQuery();
-            resultSet.next();
+            Player player = null;
+            if (resultSet.next()) {
+                String name = resultSet.getString("NAME");
+                float score = resultSet.getFloat("SCORE");
+                int wins = resultSet.getInt("WINS");
+                int adr = resultSet.getInt("ADR");
 
-            String name = resultSet.getString("NAME");
-            float score = resultSet.getFloat("SCORE");
-            int wins = resultSet.getInt("WINS");
-            int adr = resultSet.getInt("ADR");
-
-            Player player = new Player();
-            player.setName(name);
-            player.setMaxPoints(score);
-            player.setWins(wins);
-            player.setAdr(adr);
+                player = new Player();
+                player.setName(name);
+                player.setMaxPoints(score);
+                player.setWins(wins);
+                player.setAdr(adr);
+            }
             return player;
 
         } catch (SQLException e) {
