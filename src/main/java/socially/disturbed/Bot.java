@@ -77,8 +77,8 @@ public class Bot {
         if (arrOfMsg.length >= 3) {
             String player = arrOfMsg[1];
             String scoreType = arrOfMsg[2];
-
             System.out.println("Scoretype " + scoreType);
+
             if (scoreType.equalsIgnoreCase("win")) {
                 dbService.updatePlayerWin(player, true);
             }
