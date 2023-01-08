@@ -1,2 +1,4 @@
-package socially.disturbed;public class EventHandler {
+package socially.disturbed;
+
+public class EventHandler {
 }
