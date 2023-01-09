@@ -40,10 +40,10 @@ public class Bot {
     }
 
     private void handleMessage(Message message) {
-        CommandDto commandDto = new CommandDto(message);
         String messageString = message.getContent();
         if (message.getAuthor().get().isBot() && messageString.indexOf("!") != 0) return;
         if (messageString.indexOf("!") == 0) {
+            CommandDto commandDto = new CommandDto(message);
             commandDto = commandIntepreter.invokeMethod(commandDto);
             MessageChannel channel;
             if (commandDto.getReturnMsgChannelId() == null) {
