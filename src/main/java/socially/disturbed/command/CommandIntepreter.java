@@ -1,4 +1,4 @@
-package socially.disturbed.commands;
+package socially.disturbed.command;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -15,27 +15,22 @@ public class CommandIntepreter {
         this.functions = functions;
     }
 
-    public String invokeMethod(String commandString) {
-        String methodName = parseCommand(commandString);
-        if (GET_ALL_METHODS.equals(methodName)) return listOfMethods();
-
-        String arguments = commandString.substring(commandString.indexOf(" ") + 1);
+    public CommandDto invokeMethod(CommandDto commandDto) {
+        if (GET_ALL_METHODS.equals(commandDto.getMethodName())) {
+            commandDto.setReturningMsg(listOfMethods());
+            return commandDto;
+        }
 
         try {
-            Method method = functions.getClass().getDeclaredMethod(methodName, String.class);
-            return (String) method.invoke(functions, arguments);
+            Method method = functions.getClass().getDeclaredMethod(commandDto.getMethodName(), CommandDto.class);
+            return (CommandDto) method.invoke(functions, commandDto);
         } catch (NoSuchMethodException e) {
-            return "Method not found: " + methodName;
+            commandDto.setReturningMsg("Method not found: " + commandDto.getMethodName());
         } catch (InvocationTargetException | IllegalAccessException e) {
-            return methodName + " <- can't be invoked with arguments: " + arguments +
-                    ", " + e.getMessage();
+            commandDto.setReturningMsg(commandDto.getMethodName() + " <- can't be invoked with commandArguments: "
+                    + commandDto.getCommandArguments() + ", " + e.getMessage());
         }
-    }
-
-    private String parseCommand(String commandString) {
-        return commandString.contains(" ") ?
-                commandString.substring(1, commandString.indexOf(" ")) :
-                commandString.substring(1);
+        return commandDto;
     }
 
     private String listOfMethods() {

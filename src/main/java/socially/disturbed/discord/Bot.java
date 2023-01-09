@@ -1,5 +1,6 @@
 package socially.disturbed.discord;
 
+import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
@@ -8,8 +9,9 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
 import socially.disturbed.DbService;
-import socially.disturbed.commands.CommandIntepreter;
-import socially.disturbed.commands.SDFunctionsImpl;
+import socially.disturbed.command.CommandDto;
+import socially.disturbed.command.CommandIntepreter;
+import socially.disturbed.command.SDFunctionsImpl;
 
 public class Bot {
     DbService dbService;
@@ -38,13 +40,34 @@ public class Bot {
     }
 
     private void handleMessage(Message message) {
-
-        if (message.getAuthor().get().isBot()) return;
         String messageString = message.getContent();
+        if (message.getAuthor().get().isBot() && messageString.indexOf("!") != 0) return;
         if (messageString.indexOf("!") == 0) {
-            String result = commandIntepreter.invokeMethod(messageString);
-            MessageChannel channel = message.getChannel().block();
-            channel.createMessage(result).subscribe();
+            CommandDto commandDto = new CommandDto(message);
+            commandDto = commandIntepreter.invokeMethod(commandDto);
+            MessageChannel channel;
+            if (commandDto.getReturnMsgChannelId() == null) {
+                channel = message.getChannel().block();
+            }
+            else {
+                channel = gateway.getChannelById(
+                        Snowflake.of(commandDto.getReturnMsgChannelId())).cast(MessageChannel.class).block();
+            }
+            if (commandDto.deleteLastChannelMsg()) {
+                deleteLastChannelMsg(channel);
+            }
+            if (commandDto.deleteCommandMsg()) {
+                message.delete().subscribe();
+            }
+            channel.createMessage(commandDto.getReturningMsg()).subscribe();
+        }
+    }
+
+    private void deleteLastChannelMsg(MessageChannel channel) {
+        try {
+            channel.getLastMessage().block().delete().subscribe();
+        } catch (Exception e) {
+            System.out.println("Failed to delete last message, moving calmly forward");
         }
     }
 }
