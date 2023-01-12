@@ -1,15 +1,39 @@
 package socially.disturbed.utility;
 
+import socially.disturbed.presentation.User;
+
+import java.util.Set;
+
 public class Utilities {
     public static final String commands =
             "Updating SDList: \n" +
-            "!add <player> NOT IMPLEMENTED\n" +
-            "!update <player> win \n" +
-            "!update <player> <SCORE/ADR> <value> \n" +
+            "!updateSDWin <player> \n" +
+            "!updateSDScore <player> <value> \n" +
             "!delete <player> NOT IMPLEMENTED\n\n" +
             "Updating GuestList: \n" +
-            "!updateGuest <player> win \n" +
-            "!addGuest <player>\n" +
-            "!updateGuest <player> <SCORE/ADR> <value> \n" +
+            "!updateGuestWin <player> \n" +
+            "!updateGuestScore <player> <value> \n" +
             "!deleteGuest <player> NOT IMPLEMENTED\n\n";
+
+    public static String stringSetToStringWithDelim(Set<String> players, String delim) {
+        StringBuilder sb = new StringBuilder();
+
+        String loopDelim = "";
+        for(String s : players) {
+            sb.append(loopDelim);
+            sb.append(s);
+
+            loopDelim = delim;
+        }
+
+        return sb.toString();
+    }
+
+    public static String userSetToHighscoreList(Set<User> users) {
+        StringBuilder newHigshcoreList = new StringBuilder();
+        for (User p: users) {
+            newHigshcoreList.append(p.toString());
+        }
+        return newHigshcoreList.toString();
+    }
 }

@@ -1,7 +1,6 @@
 package socially.disturbed.command;
 
-import discord4j.core.object.entity.channel.MessageChannel;
-import socially.disturbed.DbService;
+import socially.disturbed.database.DbService;
 import socially.disturbed.api.pubg.model.match.Match;
 import socially.disturbed.api.pubg.model.match.MatchId;
 import socially.disturbed.api.pubg.model.player.Participant;
@@ -11,10 +10,12 @@ import socially.disturbed.api.pubg.service.PlayerService;
 import socially.disturbed.api.pubg.service.impl.DefaultMatchService;
 import socially.disturbed.api.pubg.service.impl.DefaultPlayerService;
 import socially.disturbed.discord.DiscordChannelID;
+import socially.disturbed.utility.Utilities;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
+
+import static socially.disturbed.utility.Utilities.userSetToHighscoreList;
 
 public class SDFunctionsImpl implements SDFunctions {
 
@@ -75,16 +76,16 @@ public class SDFunctionsImpl implements SDFunctions {
         String updateInfo = commandDto.getCommandArguments();
         String[] arrOfMsg = updateInfo.split(" ");
         System.out.println(Arrays.toString(arrOfMsg));
-        if (arrOfMsg.length != 3) {
+        if (arrOfMsg.length != 2) {
             commandDto.setReturningMsg("Wrong amount of arguments, should be 3: " + arrOfMsg);
             return commandDto;
         }
+
         String player = arrOfMsg[0];
-        String scoreType = arrOfMsg[1];
-        float scoreValue = Float.parseFloat(arrOfMsg[2]);
+        float score = Float.parseFloat(arrOfMsg[1]);
 
         commandDto.setReturningMsg(
-                playersListToString(dbService.updatePlayer(player, true, scoreType, scoreValue)));
+                userSetToHighscoreList(dbService.updateUserScore(player, true, score)));
         commandDto.deleteLastChannelMsg(true);
         commandDto.deleteCommandMsg(true);
         commandDto.setReturnMsgChannelId(DiscordChannelID.GUEST_HIGHSCORE.label);
@@ -95,7 +96,7 @@ public class SDFunctionsImpl implements SDFunctions {
     public CommandDto updateGuestWin(CommandDto commandDto) {
         String playerName = commandDto.getCommandArguments();
         commandDto.setReturningMsg(
-                playersListToString(dbService.updatePlayerWin(playerName, true)));
+                userSetToHighscoreList(dbService.updateUserWin(playerName, true)));
         commandDto.deleteLastChannelMsg(true);
         commandDto.deleteCommandMsg(true);
         commandDto.setReturnMsgChannelId(DiscordChannelID.GUEST_HIGHSCORE.label);
@@ -106,17 +107,16 @@ public class SDFunctionsImpl implements SDFunctions {
     public CommandDto updateSDScore(CommandDto commandDto) {
         String updateInfo = commandDto.getCommandArguments();
         String[] arrOfMsg = updateInfo.split(" ");
-        if (arrOfMsg.length != 3) {
+        if (arrOfMsg.length != 2) {
             commandDto.setReturningMsg("Wrong amount of arguments, should be 3: " + arrOfMsg);
             return commandDto;
         }
-        System.out.println(Arrays.toString(arrOfMsg));
+
         String player = arrOfMsg[0];
-        String scoreType = arrOfMsg[1];
-        float scoreValue = Float.parseFloat(arrOfMsg[2]);
+        float score = Float.parseFloat(arrOfMsg[1]);
 
         commandDto.setReturningMsg(
-                playersListToString(dbService.updatePlayer(player, false, scoreType, scoreValue)));
+                userSetToHighscoreList(dbService.updateUserScore(player, false, score)));
         commandDto.deleteLastChannelMsg(true);
         commandDto.deleteCommandMsg(true);
         commandDto.setReturnMsgChannelId(DiscordChannelID.SD_HIGHSCORE.label);
@@ -127,26 +127,16 @@ public class SDFunctionsImpl implements SDFunctions {
     public CommandDto updateSDWin(CommandDto commandDto) {
         String playerName = commandDto.getCommandArguments();
         commandDto.setReturningMsg(
-                playersListToString(dbService.updatePlayerWin(playerName, false)));
+                userSetToHighscoreList(dbService.updateUserWin(playerName, false)));
         commandDto.deleteLastChannelMsg(true);
         commandDto.deleteCommandMsg(true);
         commandDto.setReturnMsgChannelId(DiscordChannelID.SD_HIGHSCORE.label);
         return commandDto;
     }
 
-    private String playersListToString(List<socially.disturbed.presentation.Player> players) {
-        StringBuilder message = new StringBuilder();
-        for (socially.disturbed.presentation.Player p: players) {
-            message.append(p.toString());
-        }
-        return message.toString();
-    }
-
-    private void deleteLastChannelMsg(MessageChannel channel) {
-        try {
-            channel.getLastMessage().block().delete().subscribe();
-        } catch (Exception e) {
-            System.out.println("Failed to delete last message, moving calmly forward");
-        }
+    @Override
+    public CommandDto help(CommandDto commandDto) {
+        commandDto.setReturningMsg(Utilities.commands);
+        return commandDto;
     }
 }

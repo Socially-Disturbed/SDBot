@@ -1,6 +1,5 @@
 package socially.disturbed.discord;
 
-import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
@@ -8,20 +7,19 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
-import socially.disturbed.DbService;
+import org.quartz.*;
 import socially.disturbed.command.CommandDto;
 import socially.disturbed.command.CommandIntepreter;
 import socially.disturbed.command.SDFunctionsImpl;
+import socially.disturbed.cron.CronJobs;
 
 public class Bot {
-    DbService dbService;
     GatewayDiscordClient gateway;
-
     private final CommandIntepreter commandIntepreter = new CommandIntepreter(new SDFunctionsImpl());
+    public Bot() throws SchedulerException {
+        CronJobs cronUpdate = new CronJobs();
 
-    public Bot(String token, DbService dbService) {
-        this.dbService = dbService;
-
+        String token = System.getenv("disctoken");
         DiscordClient client = DiscordClient.create(token);
         gateway = client.login().block();
 
@@ -39,35 +37,23 @@ public class Bot {
         gateway.onDisconnect().block();
     }
 
-    private void handleMessage(Message message) {
+    protected void handleMessage(Message message) {
         String messageString = message.getContent();
         if (message.getAuthor().get().isBot() && messageString.indexOf("!") != 0) return;
         if (messageString.indexOf("!") == 0) {
             CommandDto commandDto = new CommandDto(message);
             commandDto = commandIntepreter.invokeMethod(commandDto);
-            MessageChannel channel;
-            if (commandDto.getReturnMsgChannelId() == null) {
-                channel = message.getChannel().block();
-            }
-            else {
-                channel = gateway.getChannelById(
-                        Snowflake.of(commandDto.getReturnMsgChannelId())).cast(MessageChannel.class).block();
-            }
-            if (commandDto.deleteLastChannelMsg()) {
-                deleteLastChannelMsg(channel);
-            }
             if (commandDto.deleteCommandMsg()) {
                 message.delete().subscribe();
             }
-            channel.createMessage(commandDto.getReturningMsg()).subscribe();
-        }
-    }
-
-    private void deleteLastChannelMsg(MessageChannel channel) {
-        try {
-            channel.getLastMessage().block().delete().subscribe();
-        } catch (Exception e) {
-            System.out.println("Failed to delete last message, moving calmly forward");
+            if (commandDto.getReturnMsgChannelId() == null) {
+                MessageChannel channel = message.getChannel().block();
+                sendMessage(channel, commandDto.getReturningMsg(), commandDto.deleteLastChannelMsg());
+            }
+            else {
+                String channelId = commandDto.getReturnMsgChannelId();
+                sendMessage(channelId, commandDto.getReturningMsg(), commandDto.deleteLastChannelMsg());
+            }
         }
     }
 }

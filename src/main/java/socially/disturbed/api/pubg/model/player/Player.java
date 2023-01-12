@@ -2,6 +2,7 @@ package socially.disturbed.api.pubg.model.player;
 
 import socially.disturbed.api.pubg.model.common.Entity;
 import socially.disturbed.api.pubg.model.match.MatchId;
+import socially.disturbed.api.pubg.model.season.RankedStats;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.List;
 public class Player extends Entity {
 
     private final String playerName;
+    public RankedStats rankedStats;
     private final List<MatchId> lastMatches = new ArrayList<>();
 
     public Player(PlayerId playerId, String playerName) {
