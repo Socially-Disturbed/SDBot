@@ -51,8 +51,7 @@ public class SeasonJsonParser {
         rankedStats.rankTier = new RankTier(currentTier.getString("tier"), currentTier.getString("subTier"));
         rankedStats.damageDealt = squadFppStats.getFloat("damageDealt");
         rankedStats.roundsPlayed = squadFppStats.getInt("roundsPlayed");
-        DecimalFormat df = new DecimalFormat("#.00");
-        rankedStats.averageDamage = Float.parseFloat(df.format(rankedStats.damageDealt / rankedStats.roundsPlayed));
+        rankedStats.averageDamage = rankedStats.damageDealt / rankedStats.roundsPlayed;
 
         return rankedStats;
     }

@@ -7,10 +7,12 @@ public class CronJobs {
     public CronJobs() {
         try {
             JobDetail job = JobBuilder.newJob(UpdateRankedStatsJob.class)
-                    .withIdentity("updateRankedStatsJob", "group1").build();
+                    .withIdentity("UpdateRankedStatsJob", "group1").build();
             Trigger cronTrigger = TriggerBuilder.newTrigger()
                     .withIdentity("cronTrigger", "group1")
-                    .withSchedule(CronScheduleBuilder.cronSchedule("0 0/5 * 1/1 * ? *"))
+                    .withSchedule(CronScheduleBuilder.cronSchedule("0/30 * * * * ?"))
+//                    .withSchedule(CronScheduleBuilder.cronSchedule("0 0/30 0 ? * * *"))
+                    .startNow()
                     .build();
             Scheduler scheduler = new StdSchedulerFactory().getScheduler();
             scheduler.start();

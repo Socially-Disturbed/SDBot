@@ -2,6 +2,7 @@ package socially.disturbed.utility;
 
 import socially.disturbed.presentation.User;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class Utilities {
@@ -35,5 +36,14 @@ public class Utilities {
             newHigshcoreList.append(p.toString());
         }
         return newHigshcoreList.toString();
+    }
+
+    public static Set<String> userSetToStringSetWithUsernames(Set<User> users) {
+        Set<String> usernames = new HashSet<>();
+        for (User player : users) {
+            usernames.add(player.name);
+        }
+
+        return usernames;
     }
 }

@@ -22,6 +22,17 @@ public class DefaultSeasonService implements SeasonService {
     }
 
     @Override
+    public Season getCurrentSeason() {
+        Set<Season> seasons = getSeasons();
+        for (Season season : seasons) {
+            if (season.isCurrentSeason)
+                return season;
+        }
+        System.out.println("Failed to get current PUBG season");
+        return null;
+    }
+
+    @Override
     public RankedStats getRankedStats(String accountId, String seasonId) {
         String request = String.format(rankedStatsEndpoint, accountId, seasonId);
         String rankedStatsJson = apiClient.makeRequest(request);

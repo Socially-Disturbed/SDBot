@@ -11,5 +11,6 @@ public interface SeasonService {
     String rankedStatsEndpoint = "/players/%s/seasons/%s/ranked";
 
     Set<Season> getSeasons();
+    Season getCurrentSeason();
     RankedStats getRankedStats(String accoundId, String seasonId);
 }

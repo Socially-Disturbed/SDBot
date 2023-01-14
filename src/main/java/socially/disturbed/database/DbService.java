@@ -84,7 +84,7 @@ public class DbService {
         else {
             statement = UPDATE_SD_SCORE;
         }
-        String columsAndValues = String.format("\"ADR\" = %f \"RANK\" = '%s'",
+        String columsAndValues = String.format("\"ADR\" = %f, \"RANK\" = '%s'",
                 player.rankedStats.averageDamage, player.rankedStats.rankTier.getRank());
         statement += " SET "+ columsAndValues + " WHERE \"NAME\" = '" + player.getPlayerName() + "'";
         System.out.println(statement);
@@ -199,8 +199,6 @@ public class DbService {
                 users.add(user);
 
             }
-            users.forEach(u -> System.out.println(u));
-
         } catch (SQLException e) {
             System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
         } catch (Exception e) {
