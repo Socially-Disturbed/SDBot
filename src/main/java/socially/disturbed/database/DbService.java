@@ -7,27 +7,18 @@ import java.sql.*;
 import java.util.HashSet;
 import java.util.Set;
 
+import static socially.disturbed.database.SQL.*;
+
 public class DbService {
-
-    public final String GET_SD_USERS = "SELECT * FROM \"SD_SCORE\"";
-    public final String GET_GUEST_USERS = "SELECT * FROM \"SD_GUEST_SCORE\"";
-    public final String GET_SD_USER = "SELECT * FROM \"SD_SCORE\"";
-    public final String GET_GUEST_USER = "SELECT * FROM \"SD_GUEST_SCORE\"";
-    public final String INSERT_NEW_GUEST_USER = "INSERT INTO \"SD_GUEST_SCORE\"(\"NAME\", \"WIN\")";
-    public final String INSERT_NEW_SD_USER = "INSERT INTO \"SD_SCORE\"(\"NAME\")";
-    public final String UPDATE_SD_SCORE = "UPDATE \"SD_SCORE\"";
-    public final String UPDATE_GUEST_SCORE = "UPDATE \"SD_GUEST_SCORE\"";
-
-
     public DbService() {}
 
     public void addUser(boolean guest, String username) {
         String statement = "";
         if (guest) {
-            statement = INSERT_NEW_GUEST_USER + " VALUES ('" + username + "', 1)";
+            statement = INSERT_NEW_GUEST_USER.label + " VALUES ('" + username + "', 1)";
         }
         else {
-            statement = INSERT_NEW_SD_USER + " VALUES ('" + username+ "')";
+            statement = INSERT_NEW_SD_USER.label + " VALUES ('" + username+ "')";
         }
         System.out.println(statement);
 
@@ -53,10 +44,10 @@ public class DbService {
         Set<User> users = new HashSet<>();
         String statement = "";
         if (guestList) {
-            statement = UPDATE_GUEST_SCORE;
+            statement = UPDATE_GUEST_SCORE.label;
         }
         else {
-            statement = UPDATE_SD_SCORE;
+            statement = UPDATE_SD_SCORE.label;
         }
         statement += " SET \"SCORE\" = " + value + " WHERE \"NAME\" = '" + username + "'";
         System.out.println(statement);
@@ -79,10 +70,10 @@ public class DbService {
     public void updateUserRankedStats(Player player, boolean guestList) {
         String statement = "";
         if (guestList) {
-            statement = UPDATE_GUEST_SCORE;
+            statement = UPDATE_GUEST_SCORE.label;
         }
         else {
-            statement = UPDATE_SD_SCORE;
+            statement = UPDATE_SD_SCORE.label;
         }
         String columsAndValues = String.format("\"ADR\" = %f, \"RANK\" = '%s'",
                 player.rankedStats.averageDamage, player.rankedStats.rankTier.getRank());
@@ -113,10 +104,10 @@ public class DbService {
 
         String statement = "";
         if (guestList) {
-            statement += UPDATE_GUEST_SCORE;
+            statement += UPDATE_GUEST_SCORE.label;
         }
         else {
-            statement += UPDATE_SD_SCORE;
+            statement += UPDATE_SD_SCORE.label;
         }
         statement += " SET \"WINS\" = " + wins + " WHERE \"NAME\" = '" + username + "'";
         System.out.println(statement);
@@ -140,10 +131,10 @@ public class DbService {
     public User getUser(String username, boolean guestList) {
         String statement = "";
         if (guestList) {
-            statement += GET_GUEST_USER;
+            statement += GET_GUEST_USER.label;
         }
         else {
-            statement += GET_SD_USER;
+            statement += GET_SD_USER.label;
         }
         statement += " WHERE \"NAME\" = '" + username + "'";
         System.out.println(statement);
@@ -175,9 +166,9 @@ public class DbService {
     public Set<User> getAllUsers(boolean guestList) {
         String statement = "";
         if (guestList) {
-            statement = GET_GUEST_USERS;
+            statement = GET_GUEST_USERS.label;
         } else {
-            statement = GET_SD_USERS;
+            statement = GET_SD_USERS.label;
         }
         Set<User> users = new HashSet<>();
         // auto close connection and preparedStatement
