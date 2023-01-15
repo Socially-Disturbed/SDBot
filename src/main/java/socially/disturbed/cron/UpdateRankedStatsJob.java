@@ -10,7 +10,7 @@ import socially.disturbed.api.pubg.service.PlayerService;
 import socially.disturbed.api.pubg.service.SeasonService;
 import socially.disturbed.api.pubg.service.impl.DefaultPlayerService;
 import socially.disturbed.api.pubg.service.impl.DefaultSeasonService;
-import socially.disturbed.discord.DiscordChannelID;
+import socially.disturbed.discord.DiscordID;
 import socially.disturbed.discord.GatewayDiscordClientWrapper;
 
 import java.util.HashSet;
@@ -52,7 +52,7 @@ public class UpdateRankedStatsJob implements Job {
         System.out.println(newGuestHighscoreList);
         System.out.println(newSDHighscoreList);
         boolean deleteLastMsg = true;
-        gatewayDiscordClientWrapper.sendMessage(DiscordChannelID.GUEST_HIGHSCORE.label, newGuestHighscoreList, deleteLastMsg);
-        gatewayDiscordClientWrapper.sendMessage(DiscordChannelID.SD_HIGHSCORE.label, newSDHighscoreList, deleteLastMsg);
+        gatewayDiscordClientWrapper.sendMessage(DiscordID.GUEST_HIGHSCORE_CHANNEL.label, newGuestHighscoreList, deleteLastMsg);
+        gatewayDiscordClientWrapper.sendMessage(DiscordID.SD_HIGHSCORE_CHANNEL.label, newSDHighscoreList, deleteLastMsg);
     }
 }

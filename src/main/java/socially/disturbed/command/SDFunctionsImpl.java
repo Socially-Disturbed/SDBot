@@ -9,7 +9,7 @@ import socially.disturbed.api.pubg.service.MatchService;
 import socially.disturbed.api.pubg.service.PlayerService;
 import socially.disturbed.api.pubg.service.impl.DefaultMatchService;
 import socially.disturbed.api.pubg.service.impl.DefaultPlayerService;
-import socially.disturbed.discord.DiscordChannelID;
+import socially.disturbed.discord.DiscordID;
 import socially.disturbed.utility.Utilities;
 
 import java.util.Arrays;
@@ -88,7 +88,7 @@ public class SDFunctionsImpl implements SDFunctions {
                 userSetToHighscoreList(dbService.updateUserScore(player, true, score)));
         commandDto.deleteLastChannelMsg(true);
         commandDto.deleteCommandMsg(true);
-        commandDto.setReturnMsgChannelId(DiscordChannelID.GUEST_HIGHSCORE.label);
+        commandDto.setReturnMsgChannelId(DiscordID.GUEST_HIGHSCORE_CHANNEL.label);
         return commandDto;
     }
 
@@ -99,7 +99,7 @@ public class SDFunctionsImpl implements SDFunctions {
                 userSetToHighscoreList(dbService.updateUserWin(playerName, true)));
         commandDto.deleteLastChannelMsg(true);
         commandDto.deleteCommandMsg(true);
-        commandDto.setReturnMsgChannelId(DiscordChannelID.GUEST_HIGHSCORE.label);
+        commandDto.setReturnMsgChannelId(DiscordID.GUEST_HIGHSCORE_CHANNEL.label);
         return commandDto;
     }
 
@@ -119,7 +119,7 @@ public class SDFunctionsImpl implements SDFunctions {
                 userSetToHighscoreList(dbService.updateUserScore(player, false, score)));
         commandDto.deleteLastChannelMsg(true);
         commandDto.deleteCommandMsg(true);
-        commandDto.setReturnMsgChannelId(DiscordChannelID.SD_HIGHSCORE.label);
+        commandDto.setReturnMsgChannelId(DiscordID.SD_HIGHSCORE_CHANNEL.label);
         return commandDto;
     }
 
@@ -130,7 +130,7 @@ public class SDFunctionsImpl implements SDFunctions {
                 userSetToHighscoreList(dbService.updateUserWin(playerName, false)));
         commandDto.deleteLastChannelMsg(true);
         commandDto.deleteCommandMsg(true);
-        commandDto.setReturnMsgChannelId(DiscordChannelID.SD_HIGHSCORE.label);
+        commandDto.setReturnMsgChannelId(DiscordID.SD_HIGHSCORE_CHANNEL.label);
         return commandDto;
     }
 
