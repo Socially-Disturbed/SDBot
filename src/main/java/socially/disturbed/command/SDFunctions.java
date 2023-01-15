@@ -13,5 +13,7 @@ public interface SDFunctions {
     CommandDto updateGuestWin(CommandDto commandDto);
     CommandDto updateSDScore(CommandDto commandDto);
     CommandDto updateSDWin(CommandDto commandDto);
+    CommandDto getGuestScoreBoard(CommandDto commandDto);
+    CommandDto getSDScoreBoard(CommandDto commandDto);
     CommandDto help(CommandDto commandDto);
 }

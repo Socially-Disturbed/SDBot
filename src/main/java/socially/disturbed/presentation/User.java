@@ -21,10 +21,14 @@ public class User {
 
     public String toString() {
         return "\n-------------------------\n"
-                + this.name + ": " + this.maxPoints + "\n"
-                + "Wins: " + this.wins + "\n"
-                + "ADR: " + this.adr + "\n"
-                + "Rank: " + this.rank + "\n"
+                + this.whiteSpaces(this.name) + ": " + this.maxPoints + "\n"
+                + this.whiteSpaces("Wins") + ": " + this.wins + "\n"
+                + this.whiteSpaces("ADR") + ": " + this.adr + "\n"
                 + "-------------------------";
+    }
+
+    private String whiteSpaces(String text) {
+        return " ".repeat(Math.max(0, (10 - text.length()))) +
+                text;
     }
 }

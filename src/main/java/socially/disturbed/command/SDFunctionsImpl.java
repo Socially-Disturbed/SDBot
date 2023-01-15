@@ -135,6 +135,18 @@ public class SDFunctionsImpl implements SDFunctions {
     }
 
     @Override
+    public CommandDto getGuestScoreBoard(CommandDto commandDto) {
+        commandDto.setReturningMsg(userSetToHighscoreList(dbService.getAllUsers(true)));
+        return commandDto;
+    }
+
+    @Override
+    public CommandDto getSDScoreBoard(CommandDto commandDto) {
+        commandDto.setReturningMsg(userSetToHighscoreList(dbService.getAllUsers(false)));
+        return commandDto;
+    }
+
+    @Override
     public CommandDto help(CommandDto commandDto) {
         commandDto.setReturningMsg(Utilities.commands);
         return commandDto;
