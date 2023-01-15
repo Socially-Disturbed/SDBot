@@ -8,39 +8,60 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
+import discord4j.core.shard.ShardingStrategy;
 import socially.disturbed.command.CommandDto;
 import socially.disturbed.command.CommandIntepreter;
 import socially.disturbed.command.SDFunctionsImpl;
 
-public class DiscordService {
-    private final CommandIntepreter commandIntepreter = new CommandIntepreter(new SDFunctionsImpl());
-    public GatewayDiscordClient discordClient;
+public class GatewayDiscordClientWrapper {
+    private final CommandIntepreter commandIntepreter;
+    private static GatewayDiscordClient gateway;
+    private static String discordToken;
 
-    public static DiscordService discordService = new DiscordService();
+    public GatewayDiscordClientWrapper() {
+        discordToken = System.getenv("disctoken");
+        if (discordToken == null) {
+            throw new RuntimeException("No discord token");
+        }
 
-    public static DiscordService getInstance() {
-        return discordService;
+        if (gateway == null) {
+            login();
+        }
+        commandIntepreter = new CommandIntepreter(new SDFunctionsImpl());
     }
 
-    public DiscordService() {
-        String token = System.getenv("disctoken");
-        DiscordClient client = DiscordClient.create(token);
-        discordClient = client.login().block();
+    public void init() {
+        startOnReadyEventListener();
+        startMessageCreateEventListener();
+        onDisconnect();
+    }
 
-        discordClient.getEventDispatcher().on(ReadyEvent.class)
+    public GatewayDiscordClient getGateway() {
+        return gateway;
+    }
+
+    private void login() {
+        DiscordClient client = DiscordClient.create(discordToken);
+        gateway = client.login().block();
+    }
+
+    private void startOnReadyEventListener() {
+        gateway.getEventDispatcher().on(ReadyEvent.class)
                 .subscribe(event -> {
                     User self = event.getSelf();
                     System.out.printf("Logged in as %s#%s%n", self.getUsername(), self.getDiscriminator());
                 });
+    }
 
-        discordClient
+    private void startMessageCreateEventListener() {
+        gateway
                 .on(MessageCreateEvent.class)
                 .map(MessageCreateEvent::getMessage)
                 .subscribe(this::handleMessage);
+    }
 
-        System.out.println("Discord blocking");
-        discordClient.onDisconnect().block();
-        System.out.println("Discord created");
+    private void onDisconnect() {
+        gateway.onDisconnect().block();
     }
 
     protected void handleMessage(Message message) {
@@ -70,7 +91,7 @@ public class DiscordService {
     }
 
     public void sendMessage(String channelId, String message, boolean deleteLastMsg) {
-        MessageChannel channel = discordClient.getChannelById(
+        MessageChannel channel = gateway.getChannelById(
                 Snowflake.of(channelId)).cast(MessageChannel.class).block();
         if (deleteLastMsg)
             deleteLastChannelMsg(channel);
