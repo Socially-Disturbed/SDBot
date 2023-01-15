@@ -13,39 +13,33 @@ import socially.disturbed.command.CommandIntepreter;
 import socially.disturbed.command.SDFunctionsImpl;
 
 public class DiscordService {
-
-    private static DiscordService discService;
     private final CommandIntepreter commandIntepreter = new CommandIntepreter(new SDFunctionsImpl());
-    GatewayDiscordClient gateway;
+    public GatewayDiscordClient discordClient;
+
+    public static DiscordService discordService = new DiscordService();
 
     public static DiscordService getInstance() {
-        if (discService == null) {
-            discService = new DiscordService();
-        }
-        System.out.println("Getting discService");
-        return discService;
+        return discordService;
     }
 
-    private DiscordService() {
-        System.out.println("Discord constructor");
+    public DiscordService() {
         String token = System.getenv("disctoken");
         DiscordClient client = DiscordClient.create(token);
-        gateway = client.login().block();
-        System.out.println("login block");
+        discordClient = client.login().block();
 
-        gateway.getEventDispatcher().on(ReadyEvent.class)
+        discordClient.getEventDispatcher().on(ReadyEvent.class)
                 .subscribe(event -> {
                     User self = event.getSelf();
                     System.out.printf("Logged in as %s#%s%n", self.getUsername(), self.getDiscriminator());
                 });
 
-        gateway
+        discordClient
                 .on(MessageCreateEvent.class)
                 .map(MessageCreateEvent::getMessage)
                 .subscribe(this::handleMessage);
 
         System.out.println("Discord blocking");
-        gateway.onDisconnect().block();
+        discordClient.onDisconnect().block();
         System.out.println("Discord created");
     }
 
@@ -76,7 +70,7 @@ public class DiscordService {
     }
 
     public void sendMessage(String channelId, String message, boolean deleteLastMsg) {
-        MessageChannel channel = gateway.getChannelById(
+        MessageChannel channel = discordClient.getChannelById(
                 Snowflake.of(channelId)).cast(MessageChannel.class).block();
         if (deleteLastMsg)
             deleteLastChannelMsg(channel);
