@@ -1,6 +1,7 @@
 package socially.disturbed.command;
 
 import socially.disturbed.command.CommandManager.Command;
+import socially.disturbed.function.SDFunctions;
 
 import java.util.function.UnaryOperator;
 

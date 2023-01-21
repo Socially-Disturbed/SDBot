@@ -1,5 +1,7 @@
 package socially.disturbed.command;
 
+import socially.disturbed.function.SDFunctions;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.UnaryOperator;

@@ -10,7 +10,7 @@ import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
 import socially.disturbed.command.CommandDto;
 import socially.disturbed.command.CommandResolver;
-import socially.disturbed.command.SDFunctionsImpl;
+import socially.disturbed.function.SDFunctionsImpl;
 
 public class GatewayDiscordClientWrapper {
     private final CommandResolver commandResolver;

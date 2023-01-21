@@ -1,4 +1,6 @@
-package socially.disturbed.command;
+package socially.disturbed.function;
+
+import socially.disturbed.command.CommandDto;
 
 /**
  * Can be invoked from Discord using ! and method name.
