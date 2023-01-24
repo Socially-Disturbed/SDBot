@@ -1,6 +1,5 @@
-package socially.disturbed.command;
+package socially.disturbed.function;
 
-import socially.disturbed.database.DbService;
 import socially.disturbed.api.pubg.model.match.Match;
 import socially.disturbed.api.pubg.model.match.MatchId;
 import socially.disturbed.api.pubg.model.player.Participant;
@@ -9,6 +8,8 @@ import socially.disturbed.api.pubg.service.MatchService;
 import socially.disturbed.api.pubg.service.PlayerService;
 import socially.disturbed.api.pubg.service.impl.DefaultMatchService;
 import socially.disturbed.api.pubg.service.impl.DefaultPlayerService;
+import socially.disturbed.command.CommandDto;
+import socially.disturbed.database.DbService;
 import socially.disturbed.discord.DiscordID;
 import socially.disturbed.utility.Utilities;
 

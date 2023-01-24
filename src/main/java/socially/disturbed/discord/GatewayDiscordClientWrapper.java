@@ -8,13 +8,12 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
-import discord4j.core.shard.ShardingStrategy;
 import socially.disturbed.command.CommandDto;
-import socially.disturbed.command.CommandIntepreter;
-import socially.disturbed.command.SDFunctionsImpl;
+import socially.disturbed.command.CommandResolver;
+import socially.disturbed.function.SDFunctionsImpl;
 
 public class GatewayDiscordClientWrapper {
-    private final CommandIntepreter commandIntepreter;
+    private final CommandResolver commandResolver;
     private static GatewayDiscordClient gateway;
     private static String discordToken;
 
@@ -27,7 +26,7 @@ public class GatewayDiscordClientWrapper {
         if (gateway == null) {
             login();
         }
-        commandIntepreter = new CommandIntepreter(new SDFunctionsImpl());
+        commandResolver = new CommandResolver(new SDFunctionsImpl());
     }
 
     public void init() {
@@ -69,7 +68,7 @@ public class GatewayDiscordClientWrapper {
         if (message.getAuthor().get().isBot() && messageString.indexOf("!") != 0) return;
         if (messageString.indexOf("!") == 0) {
             CommandDto commandDto = new CommandDto(message);
-            commandDto = commandIntepreter.invokeMethod(commandDto);
+            commandDto = commandResolver.invokeMethod(commandDto);
             if (commandDto.deleteCommandMsg()) {
                 message.delete().subscribe();
             }
