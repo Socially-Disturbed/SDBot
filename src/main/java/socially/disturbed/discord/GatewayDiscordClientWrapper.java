@@ -8,14 +8,16 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
+import discord4j.core.object.entity.channel.VoiceChannel;
 import socially.disturbed.command.CommandDto;
 import socially.disturbed.command.CommandResolver;
 import socially.disturbed.function.SDFunctionsImpl;
-
+import socially.disturbed.discord.update.UpdateHolder;
 public class GatewayDiscordClientWrapper {
     private final CommandResolver commandResolver;
     private static GatewayDiscordClient gateway;
     private static String discordToken;
+    public static UpdateHolder updateHolder = new UpdateHolder();
 
     public GatewayDiscordClientWrapper() {
         discordToken = System.getenv("disctoken");
@@ -37,6 +39,10 @@ public class GatewayDiscordClientWrapper {
 
     public GatewayDiscordClient getGateway() {
         return gateway;
+    }
+
+    public UpdateHolder getUpdateHolder() {
+        return updateHolder;
     }
 
     private void login() {
@@ -64,6 +70,8 @@ public class GatewayDiscordClientWrapper {
     }
 
     protected void handleMessage(Message message) {
+
+        VoiceChannel voiceChannel = gateway.getChannelById(Snowflake.of("889181536275025921")).;
         String messageString = message.getContent();
         if (message.getAuthor().get().isBot() && messageString.indexOf("!") != 0) return;
         if (messageString.indexOf("!") == 0) {
